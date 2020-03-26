@@ -23,7 +23,7 @@ use crate::rent;
 use sp_std::prelude::*;
 use sp_runtime::traits::{Bounded, CheckedAdd, CheckedSub, Zero};
 use frame_support::{
-	storage::unhashed, dispatch::DispatchError,
+	storage::unhashed, dispatch::{DispatchResult, DispatchError, DispatchErrorWithInfo},
 	traits::{WithdrawReason, Currency, Time, Randomness},
 };
 
@@ -66,7 +66,7 @@ impl ExecReturnValue {
 /// non-existent destination contract, etc.).
 #[cfg_attr(test, derive(sp_runtime::RuntimeDebug))]
 pub struct ExecError {
-	pub reason: DispatchError,
+	pub reason: DispatchErrorWithInfo,
 	/// This is an allocated buffer that may be reused. The buffer must be cleared explicitly
 	/// before reuse.
 	pub buffer: Vec<u8>,
@@ -126,14 +126,14 @@ pub trait Ext {
 		to: &AccountIdOf<Self::T>,
 		value: BalanceOf<Self::T>,
 		gas_meter: &mut GasMeter<Self::T>,
-	) -> Result<(), DispatchError>;
+	) -> DispatchResult;
 
 	/// Transfer all funds to `beneficiary` and delete the contract.
 	fn terminate(
 		&mut self,
 		beneficiary: &AccountIdOf<Self::T>,
 		gas_meter: &mut GasMeter<Self::T>,
-	) -> Result<(), DispatchError>;
+	) -> DispatchResult;
 
 	/// Call (possibly transferring some amount of funds) into the specified account.
 	fn call(
@@ -352,7 +352,7 @@ where
 		dest: T::AccountId,
 		value: BalanceOf<T>,
 		gas_meter: &mut GasMeter<T>
-	) -> Result<(), DispatchError> {
+	) -> DispatchResult {
 		transfer(
 			gas_meter,
 			TransferCause::Call,
@@ -532,14 +532,14 @@ where
 		&mut self,
 		beneficiary: &T::AccountId,
 		gas_meter: &mut GasMeter<T>,
-	) -> Result<(), DispatchError> {
+	) -> DispatchResult {
 		let self_id = self.self_account.clone();
 		let value = self.overlay.get_balance(&self_id);
 		if let Some(caller) = self.caller {
 			if caller.is_live(&self_id) {
 				return Err(DispatchError::Other(
 					"Cannot terminate a contract that is present on the call stack",
-				));
+				).into());
 			}
 		}
 		transfer(
@@ -551,7 +551,7 @@ where
 			self,
 		)?;
 		self.overlay.destroy_contract(&self_id);
-		Ok(())
+		Ok(None.into())
 	}
 
 	fn new_call_context<'b>(
@@ -653,7 +653,7 @@ fn transfer<'a, T: Trait, V: Vm<T>, L: Loader<T>>(
 	dest: &T::AccountId,
 	value: BalanceOf<T>,
 	ctx: &mut ExecutionContext<'a, T, V, L>,
-) -> Result<(), DispatchError> {
+) -> DispatchResult {
 	use self::TransferCause::*;
 	use self::TransferFeeKind::*;
 
@@ -715,7 +715,7 @@ fn transfer<'a, T: Trait, V: Vm<T>, L: Loader<T>>(
 		});
 	}
 
-	Ok(())
+	Ok(None.into())
 }
 
 struct CallContext<'a, 'b: 'a, T: Trait + 'b, V: Vm<T> + 'b, L: Loader<T>> {
@@ -766,7 +766,7 @@ where
 		to: &T::AccountId,
 		value: BalanceOf<T>,
 		gas_meter: &mut GasMeter<T>,
-	) -> Result<(), DispatchError> {
+	) -> DispatchResult {
 		self.ctx.transfer(to.clone(), value, gas_meter)
 	}
 
@@ -774,7 +774,7 @@ where
 		&mut self,
 		beneficiary: &AccountIdOf<Self::T>,
 		gas_meter: &mut GasMeter<Self::T>,
-	) -> Result<(), DispatchError> {
+	) -> DispatchResult {
 		self.ctx.terminate(beneficiary, gas_meter)
 	}
 
@@ -892,7 +892,7 @@ mod tests {
 	};
 	use std::{cell::RefCell, rc::Rc, collections::HashMap, marker::PhantomData};
 	use assert_matches::assert_matches;
-	use sp_runtime::DispatchError;
+	use frame_support::dispatch::{DispatchError, DispatchErrorWithInfo};
 
 	const ALICE: u64 = 1;
 	const BOB: u64 = 2;
@@ -1249,7 +1249,10 @@ mod tests {
 			assert_matches!(
 				result,
 				Err(ExecError {
-					reason: DispatchError::Other("balance too low to send value"),
+					reason: DispatchErrorWithInfo {
+						post_info: _,
+						error:DispatchError::Other("balance too low to send value"),
+					},
 					buffer: _,
 				})
 			);
@@ -1391,7 +1394,10 @@ mod tests {
 				assert_matches!(
 					r,
 					Err(ExecError {
-						reason: DispatchError::Other("reached maximum depth, cannot make a call"),
+						reason: DispatchErrorWithInfo {
+							post_info: _,
+							error: DispatchError::Other("reached maximum depth, cannot make a call"),
+						},
 						buffer: _,
 					})
 				);
@@ -1678,7 +1684,13 @@ mod tests {
 						ctx.gas_meter,
 						vec![]
 					),
-					Err(ExecError { reason: DispatchError::Other("It's a trap!"), buffer: _ })
+					Err(ExecError {
+						reason: DispatchErrorWithInfo {
+							post_info: _,
+							error: DispatchError::Other("It's a trap!"),
+						},
+						buffer: _ }
+					)
 				);
 
 				exec_success()
@@ -1735,7 +1747,10 @@ mod tests {
 						vec![],
 					),
 					Err(ExecError {
-						reason: DispatchError::Other("insufficient remaining balance"),
+						reason: DispatchErrorWithInfo {
+							post_info: _,
+							error: DispatchError::Other("insufficient remaining balance"),
+						},
 						buffer
 					}) if buffer == Vec::<u8>::new()
 				);

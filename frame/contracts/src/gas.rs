@@ -21,7 +21,7 @@ use sp_runtime::traits::{
 };
 use frame_support::{
 	traits::{Currency, ExistenceRequirement, Imbalance, OnUnbalanced, WithdrawReason}, StorageValue,
-	dispatch::DispatchError,
+	dispatch::{DispatchErrorWithInfo},
 };
 
 #[cfg(test)]
@@ -202,7 +202,7 @@ impl<T: Trait> GasMeter<T> {
 pub fn buy_gas<T: Trait>(
 	transactor: &T::AccountId,
 	gas_limit: Gas,
-) -> Result<(GasMeter<T>, NegativeImbalanceOf<T>), DispatchError> {
+) -> Result<(GasMeter<T>, NegativeImbalanceOf<T>), DispatchErrorWithInfo> {
 	// Buy the specified amount of gas.
 	let gas_price = <Module<T>>::gas_price();
 	let cost = if gas_price.is_zero() {

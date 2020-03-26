@@ -116,6 +116,31 @@ pub struct DispatchInfo {
 	pub pays_fee: bool,
 }
 
+/// Weight information that is only available post dispatch.
+#[derive(Clone, Copy, Eq, PartialEq, Default, RuntimeDebug, Encode, Decode)]
+pub struct PostDispatchInfo {
+	/// Actual weight consumed by a call or `None` which stands for the worst case static weight.
+	pub actual_weight: Option<Weight>,
+}
+
+impl From<Option<Weight>> for PostDispatchInfo {
+	fn from(actual_weight: Option<Weight>) -> Self {
+		Self {
+			actual_weight,
+		}
+	}
+}
+
+impl sp_runtime::traits::Printable for PostDispatchInfo {
+	fn print(&self) {
+		"actual_weight=".print();
+		match self.actual_weight {
+			Some(weight) => weight.print(),
+			None => "max-weight".print(),
+		}
+	}
+}
+
 /// A `Dispatchable` function (aka transaction) that can carry some static information along with
 /// it, using the `#[weight]` attribute.
 pub trait GetDispatchInfo {

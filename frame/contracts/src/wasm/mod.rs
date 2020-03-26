@@ -161,7 +161,7 @@ mod tests {
 	use wabt;
 	use hex_literal::hex;
 	use assert_matches::assert_matches;
-	use sp_runtime::DispatchError;
+	use frame_support::dispatch::{DispatchError, DispatchErrorWithInfo, DispatchResult};
 
 	#[derive(Debug, PartialEq, Eq)]
 	struct DispatchEntry(Call);
@@ -262,14 +262,14 @@ mod tests {
 			to: &u64,
 			value: u64,
 			gas_meter: &mut GasMeter<Test>,
-		) -> Result<(), DispatchError> {
+		) -> DispatchResult {
 			self.transfers.push(TransferEntry {
 				to: *to,
 				value,
 				data: Vec::new(),
 				gas_left: gas_meter.gas_left(),
 			});
-			Ok(())
+			Ok(None.into())
 		}
 		fn call(
 			&mut self,
@@ -292,12 +292,12 @@ mod tests {
 			&mut self,
 			beneficiary: &u64,
 			gas_meter: &mut GasMeter<Test>,
-		) -> Result<(), DispatchError> {
+		) -> DispatchResult {
 			self.terminations.push(TerminationEntry {
 				beneficiary: *beneficiary,
 				gas_left: gas_meter.gas_left(),
 			});
-			Ok(())
+			Ok(None.into())
 		}
 		fn note_dispatch_call(&mut self, call: Call) {
 			self.dispatches.push(DispatchEntry(call));
@@ -400,14 +400,14 @@ mod tests {
 			to: &u64,
 			value: u64,
 			gas_meter: &mut GasMeter<Test>,
-		) -> Result<(), DispatchError> {
+		) -> DispatchResult {
 			(**self).transfer(to, value, gas_meter)
 		}
 		fn terminate(
 			&mut self,
 			beneficiary: &u64,
 			gas_meter: &mut GasMeter<Test>,
-		) -> Result<(), DispatchError> {
+		) -> DispatchResult {
 			(**self).terminate(beneficiary, gas_meter)
 		}
 		fn call(
@@ -1644,7 +1644,11 @@ mod tests {
 				&mut gas_meter
 			),
 			Err(ExecError {
-				reason: DispatchError::Other("contract trapped during execution"), buffer: _
+				reason: DispatchErrorWithInfo {
+					post_info: _,
+					error: DispatchError::Other("contract trapped during execution"),
+				},
+				buffer: _
 			})
 		);
 	}
@@ -1687,7 +1691,13 @@ mod tests {
 				MockExt::default(),
 				&mut gas_meter
 			),
-			Err(ExecError { reason: DispatchError::Other("contract trapped during execution"), buffer: _ })
+			Err(ExecError {
+				reason: DispatchErrorWithInfo {
+					post_info: _,
+					error: DispatchError::Other("contract trapped during execution"),
+				},
+				buffer: _
+			})
 		);
 	}
 

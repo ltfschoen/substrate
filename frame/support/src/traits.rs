@@ -23,10 +23,10 @@ use codec::{FullCodec, Codec, Encode, Decode};
 use sp_core::u32_trait::Value as U32;
 use sp_runtime::{
 	RuntimeDebug,
-	ConsensusEngineId, DispatchResult, DispatchError,
+	ConsensusEngineId, DispatchError,
 	traits::{MaybeSerializeDeserialize, AtLeast32Bit, Saturating, TrailingZeroInput, Bounded},
 };
-use crate::dispatch::Parameter;
+use crate::dispatch::{Parameter, DispatchResult, DispatchErrorWithInfo};
 use crate::storage::StorageMap;
 use impl_trait_for_tuples::impl_for_tuples;
 
@@ -686,7 +686,7 @@ pub trait Currency<AccountId> {
 		value: Self::Balance,
 		reasons: WithdrawReasons,
 		liveness: ExistenceRequirement,
-	) -> result::Result<Self::NegativeImbalance, DispatchError>;
+	) -> result::Result<Self::NegativeImbalance, DispatchErrorWithInfo>;
 
 	/// Similar to withdraw, only accepts a `PositiveImbalance` and returns nothing on success.
 	fn settle(
