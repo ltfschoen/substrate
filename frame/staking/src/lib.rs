@@ -1100,7 +1100,9 @@ decl_storage! {
 		config(stakers):
 			Vec<(T::AccountId, T::AccountId, BalanceOf<T>, StakerStatus<T::AccountId>)>;
 		build(|config: &GenesisConfig<T>| {
+			log!(warn, "config.stakers [{:?}]", config);
 			for &(ref stash, ref controller, balance, ref status) in &config.stakers {
+				log!(warn, "config.stakers [{:?}] [{:?}] [{:?}] [{:?}]", stash, controller, balance, status);
 				assert!(
 					T::Currency::free_balance(&stash) >= balance,
 					"Stash does not have enough balance to bond."
@@ -3021,6 +3023,8 @@ impl<T: Config> Module<T> {
 			(n, s, ns)
 		}));
 
+		log!(warn, "all_validators [{:?}] [{:?}] [{:?}] [{:?}]", all_validators.len(), Self::minimum_validator_count().max(1));
+		log!(warn, "--nooo validator_count [{:?}] [{:?}]", Self::validator_count() as usize, all_nominators);
 		if all_validators.len() < Self::minimum_validator_count().max(1) as usize {
 			// If we don't have enough candidates, nothing to do.
 			log!(
@@ -3030,6 +3034,7 @@ impl<T: Config> Module<T> {
 			);
 			None
 		} else {
+			log!(warn, "--nooo");
 			seq_phragmen::<_, Accuracy>(
 				Self::validator_count() as usize,
 				all_validators,
