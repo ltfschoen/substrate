@@ -2,8 +2,8 @@
 
 A fresh [Substrate](https://substrate.io/) node, ready for hacking :rocket:
 
-A standalone version of this template is available  for each release of Polkadot in the [Substrate Developer Hub  Parachain Template](https://github.com/substrate-developer-hub/substrate-parachain-template/) repository.
-The parachain template is generated directly at each Polkadot release branch form the [Node Template in Substreate](https://github.com/paritytech/substrate/tree/master/bin/node-template) upstream
+A standalone version of this template is available for each release of Polkadot in the [Substrate Developer Hub Parachain Template](https://github.com/substrate-developer-hub/substrate-parachain-template/) repository.
+The parachain template is generated directly at each Polkadot release branch from the [Node Template in Substreate](https://github.com/paritytech/substrate/tree/master/bin/node-template) upstream.
 
 It is usually best to to use the stand-alone version to start a new project.
 All bugs, suggestions, and feature requests should be made upstream in the [Substrate](https://github.com/paritytech/substrate/tree/master/bin/node-template) repository.
@@ -62,7 +62,6 @@ Development chains:
 - Use the **Alice** and **Bob** accounts as default validator authorities.
 - Use the **Alice** account as the default `sudo` account.
 - Are preconfigured with a genesis state (`/node/src/chain_spec.rs`) that includes several prefunded development accounts.
-
 
 To persist chain state between runs, specify a base path by running a command similar to the following:
 
