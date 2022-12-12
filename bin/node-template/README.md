@@ -100,8 +100,7 @@ A Substrate project such as this consists of a number of components that are spr
 A blockchain node is an application that allows users to participate in a blockchain network.
 Substrate-based blockchain nodes expose a number of capabilities:
 
-- Networking: Substrate nodes use the [`libp2p`](https://libp2p.io/) networking stack to allow the
-  nodes in the network to communicate with one another.
+- Networking: Substrate nodes use the [`libp2p`](https://libp2p.io/) networking stack to allow the nodes in the network to communicate with one another.
 - Consensus: Blockchains must have a way to come to [consensus](https://docs.substrate.io/fundamentals/consensus/) on the state of the network.
   Substrate makes it possible to supply custom consensus engines and also ships with several consensus mechanisms that have been built on top of [Web3 Foundation research](https://research.web3.foundation/en/latest/polkadot/NPoS/index.html).
 - RPC Server: A remote procedure call (RPC) server is used to interact with Substrate nodes.
