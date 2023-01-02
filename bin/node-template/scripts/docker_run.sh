@@ -8,6 +8,7 @@ SCRIPT_DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
 PARENT_DIR=$(dirname "$SCRIPT_DIR")
 mkdir -p "$PARENT_DIR/.local"
 mkdir -p "$PARENT_DIR/.cargo/registry"
+NODE_DIR="$PARENT_DIR/node"
 
 cd $(dirname ${BASH_SOURCE[0]})/..
 
@@ -40,7 +41,7 @@ else
 
         # ONBUILD https://stackoverflow.com/a/54245466/3208553
 
-        export NODE_DIR=./bin/node-template/node && DOCKER_BUILDKIT=0 docker compose -f docker-compose.yml build
+        export NODE_DIR=${NODE_DIR} && DOCKER_BUILDKIT=0 docker compose -f docker-compose.yml build
     else
         printf "Skipping docker since docker executable subcommand not supported.\n"
     fi

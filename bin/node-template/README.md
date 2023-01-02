@@ -160,7 +160,7 @@ To get all the correct dependencies, activate direnv `direnv allow` and lorri `l
 
 First, install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/).
 
-Then run the following command to start a single node development chain.
+Then run the following command to start a single node development chain from the pre-build Docker image specified in docker-compose.yml.
 
 > If you get an error that tcp port address is already in use then find an available port to use for the host port in docker-compose.yml (i.e. "<HOST_PORT>:9944").
 
@@ -181,4 +181,10 @@ For example:
 
 # Check whether the code is compilable
 ./scripts/docker_run.sh cargo check
+```
+
+If you want to run a custom Docker build for the node template then run:
+
+```sh
+./scripts/docker_run_custom.sh
 ```

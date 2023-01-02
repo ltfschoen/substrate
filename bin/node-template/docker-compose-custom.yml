@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  dev:
+    container_name: node-template
+    restart: always
+    build:
+      context: "../../"
+      dockerfile: ../../docker/node_template_builder.Dockerfile
+    ports:
+      - "9933:9933"
+      - "9944:9944"
+      - "9615:9615"
+      - "30333:30333"
+    environment:
+      - CARGO_HOME=/node-template/.cargo
+    volumes:
+      # - .:/node-template
+      # - ./.cargo:/node-template/.cargo
+      # - ./.local:/node-template/.local
+      # - ../../frame:/frame
+      # - ../../utils:/utils
+      # - ../../client:/client
+      # - ../../primitives:/primitives
+      - type: bind
+        source: ./.git
+        target: /node-template/.git
+      - type: bind
+        source: ./frame
+        target: /frame
+      - type: bind
+        source: ./utils
+        target: /utils
+      - type: bind
+        source: ./client
+        target: /client
+      - type: bind
+        source: ./primitives
+        target: /primitives
+      - type: bind
+        source: ./bin/node-template/.cargo/registry
+        target: /node-template/.cargo/registry
+      - type: bind
+        source: ./bin/node-template/.local
+        target: /node-template/.local
