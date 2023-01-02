@@ -1,9 +1,12 @@
 # This is the build stage for Substrate. Here we create the binary.
 FROM docker.io/paritytech/ci-linux:production as builder
 
+ARG NODE_DIR=${NODE_DIR}
 WORKDIR /substrate
 COPY . /substrate
-RUN cargo build --locked --release
+
+RUN cd ${NODE_DIR} && CARGO_TARGET_DIR=/substrate/target cargo build --locked --release && cd /substrate \
+	&& ls -al /substrate/target/release
 
 # This is the 2nd stage: a very small image where we copy the Substrate binary."
 FROM docker.io/library/ubuntu:20.04

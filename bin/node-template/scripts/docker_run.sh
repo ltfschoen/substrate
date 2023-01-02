@@ -17,8 +17,8 @@ if ! [ -x "$(command -v docker-compose)" ]; then
     printf "Skipping docker-compose since executable is not installed.\n"
 else
     printf "Detected docker-compose executable.\n"
-    docker-compose down --remove-orphans
-    docker-compose run --rm --service-ports dev $@
+    # docker-compose down --remove-orphans
+    # docker-compose run --rm --service-ports dev $@
     exit
 fi
 
@@ -30,8 +30,17 @@ else
     exit_code=$(docker compose version &> /dev/null && echo $?)
     if [ $exit_code == "0" ]; then
         printf "Detected docker compose subcommand.\n"
-        docker compose down --remove-orphans
-        docker compose run --rm --service-ports dev $@
+        # docker compose down --remove-orphans
+        # docker compose run --rm --service-ports dev $@
+
+        # frame="frame" && [ ! -f $frame ] && [ ! -L $frame ] && ln -s ../../$frame $frame
+        # utils="utils" && [ ! -f $utils ] && [ ! -L $utils ] && ln -s ../../$utils $utils
+        # client="client" && [ ! -f $client ] && [ ! -L $client ] && ln -s ../../$client $client
+        # primitives="primitives" && [ ! -f $primitives ] && [ ! -L $primitives ] && ln -s ../../$primitives $primitives
+
+        # ONBUILD https://stackoverflow.com/a/54245466/3208553
+
+        export NODE_DIR=./bin/node-template/node && DOCKER_BUILDKIT=0 docker compose -f docker-compose.yml build
     else
         printf "Skipping docker since docker executable subcommand not supported.\n"
     fi
