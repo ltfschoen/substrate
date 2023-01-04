@@ -2,28 +2,22 @@ services:
 # first line of this file must be reserved for use by ./scripts/docker_run.sh
   dev:
     container_name: node-template
-    image: paritytech/ci-linux:production
-    working_dir: /var/www/node-template
+    restart: always
+    build:
+      context: "../../"
+      dockerfile: ./docker/substrate_node_template_builder.Dockerfile
+    working_dir: /node-template
     ports:
       - "9933:9933"
       - "9944:9944"
       - "9615:9615"
       - "30333:30333"
     environment:
-      - CARGO_HOME=/var/www/node-template/target/.cargo
+      - CARGO_HOME=/node-template/target/.cargo
     volumes:
-      - .:/var/www/node-template
-      - ../../frame:/var/frame
-      - ../../utils:/var/utils
-      - ../../client:/var/client
-      - ../../primitives:/var/primitives
-    command: >
-      bash -c "cargo build --locked --release && \
-        cp /var/www/node-template/target/release/node-template /usr/local/bin && \
-        useradd -o -m -u 1000 -U -s /bin/sh -d /var/www/node-template node-dev && \
-        mkdir -p /data /var/www/node-template/.local/share && \
-        chown -R node-dev:node-dev /data && \
-        ln -s /data /var/www/node-template/.local/share/node-template && \
-        rm -rf /usr/bin /usr/sbin && \
-        /usr/local/bin/node-template --version && \
-        /usr/local/bin/node-template --dev --ws-external"
+      - ./bin/node_template:/node-template
+      - ./frame:/frame
+      - ./utils:/utils
+      - ./client:/client
+      - ./primitives:/primitives
+

@@ -42,7 +42,7 @@ else
         # switch back to default `services:` incase was temporarily commented out
         modify_first_line_of_docker_compose "services:"
         docker-compose compose down --remove-orphans
-        docker-compose compose run --rm --service-ports dev $@
+        DOCKER_BUILDKIT=0 docker-compose compose run --rm --service-ports dev $@
         exit
     fi
 
