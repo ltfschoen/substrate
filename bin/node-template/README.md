@@ -171,6 +171,7 @@ Then run the following command to start a single node development chain.
 This command compiles the code and starts a local development network.
 You can also replace the default command (`cargo build --release && ./target/release/node-template --dev --ws-external`) by appending your own.
 Note: It is recommended to provide a custom `--base-path` to store the chain database.
+
 For example:
 
 ```sh
