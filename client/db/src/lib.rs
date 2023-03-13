@@ -37,8 +37,8 @@ mod parity_db;
 mod pinned_blocks_cache;
 mod record_stats_state;
 mod stats;
-#[cfg(any(feature = "rocksdb", test))]
-mod upgrade;
+// #[cfg(any(feature = "rocksdb", test))]
+// mod upgrade;
 mod utils;
 
 use linked_hash_map::LinkedHashMap;
@@ -320,21 +320,22 @@ pub enum DatabaseSource {
 	Auto {
 		/// Path to the paritydb database.
 		paritydb_path: PathBuf,
-		/// Path to the rocksdb database.
-		rocksdb_path: PathBuf,
+		// /// Path to the rocksdb database.
+		// rocksdb_path: PathBuf,
 		/// Cache size in MiB. Used only by `RocksDb` variant of `DatabaseSource`.
 		cache_size: usize,
 	},
-	/// Load a RocksDB database from a given path. Recommended for most uses.
-	#[cfg(feature = "rocksdb")]
-	RocksDb {
-		/// Path to the database.
-		path: PathBuf,
-		/// Cache size in MiB.
-		cache_size: usize,
-	},
+	// /// Load a RocksDB database from a given path. Recommended for most uses.
+	// #[cfg(feature = "rocksdb")]
+	// RocksDb {
+	// 	/// Path to the database.
+	// 	path: PathBuf,
+	// 	/// Cache size in MiB.
+	// 	cache_size: usize,
+	// },
 
 	/// Load a ParityDb database from a given path.
+	#[cfg(feature = "paritydb")]
 	ParityDb {
 		/// Path to the database.
 		path: PathBuf,
@@ -360,7 +361,8 @@ impl DatabaseSource {
 			// I would think rocksdb, but later parity-db.
 			DatabaseSource::Auto { paritydb_path, .. } => Some(paritydb_path),
 			#[cfg(feature = "rocksdb")]
-			DatabaseSource::RocksDb { path, .. } => Some(path),
+			// DatabaseSource::RocksDb { path, .. } => Some(path),
+			#[cfg(feature = "paritydb")]
 			DatabaseSource::ParityDb { path } => Some(path),
 			DatabaseSource::Custom { .. } => None,
 		}
@@ -373,11 +375,12 @@ impl DatabaseSource {
 				*paritydb_path = p.into();
 				true
 			},
-			#[cfg(feature = "rocksdb")]
-			DatabaseSource::RocksDb { ref mut path, .. } => {
-				*path = p.into();
-				true
-			},
+			// #[cfg(feature = "rocksdb")]
+			// DatabaseSource::RocksDb { ref mut path, .. } => {
+			// 	*path = p.into();
+			// 	true
+			// },
+			#[cfg(feature = "paritydb")]
 			DatabaseSource::ParityDb { ref mut path } => {
 				*path = p.into();
 				true
@@ -391,8 +394,9 @@ impl std::fmt::Display for DatabaseSource {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		let name = match self {
 			DatabaseSource::Auto { .. } => "Auto",
-			#[cfg(feature = "rocksdb")]
-			DatabaseSource::RocksDb { .. } => "RocksDb",
+			// #[cfg(feature = "rocksdb")]
+			// DatabaseSource::RocksDb { .. } => "RocksDb",
+			#[cfg(feature = "paritydb")]
 			DatabaseSource::ParityDb { .. } => "ParityDb",
 			DatabaseSource::Custom { .. } => "Custom",
 		};

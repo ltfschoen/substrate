@@ -213,20 +213,21 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 		database: Database,
 	) -> Result<DatabaseSource> {
 		let role_dir = "full";
-		let rocksdb_path = base_path.join("db").join(role_dir);
+		// let rocksdb_path = base_path.join("db").join(role_dir);
 		let paritydb_path = base_path.join("paritydb").join(role_dir);
 		Ok(match database {
-			#[cfg(feature = "rocksdb")]
-			Database::RocksDb => DatabaseSource::RocksDb { path: rocksdb_path, cache_size },
+			// #[cfg(feature = "rocksdb")]
+			// Database::RocksDb => DatabaseSource::RocksDb { path: rocksdb_path, cache_size },
+			#[cfg(feature = "paritydb")]
 			Database::ParityDb => DatabaseSource::ParityDb { path: paritydb_path },
-			Database::ParityDbDeprecated => {
-				eprintln!(
-					"WARNING: \"paritydb-experimental\" database setting is deprecated and will be removed in future releases. \
-				Please update your setup to use the new value: \"paritydb\"."
-				);
-				DatabaseSource::ParityDb { path: paritydb_path }
-			},
-			Database::Auto => DatabaseSource::Auto { paritydb_path, rocksdb_path, cache_size },
+			// Database::ParityDbDeprecated => {
+			// 	eprintln!(
+			// 		"WARNING: \"paritydb-experimental\" database setting is deprecated and will be removed in future releases. \
+			// 	Please update your setup to use the new value: \"paritydb\"."
+			// 	);
+			// 	DatabaseSource::ParityDb { path: paritydb_path }
+			// },
+			Database::Auto => DatabaseSource::Auto { paritydb_path, cache_size },
 		})
 	}
 
@@ -492,11 +493,12 @@ pub trait CliConfiguration<DCV: DefaultConfigurationValues = ()>: Sized {
 		let client_id = C::client_id();
 		let database_cache_size = self.database_cache_size()?.unwrap_or(1024);
 		let database = self.database()?.unwrap_or(
-			#[cfg(feature = "rocksdb")]
-			{
-				Database::RocksDb
-			},
-			#[cfg(not(feature = "rocksdb"))]
+			// #[cfg(feature = "rocksdb")]
+			// {
+			// 	Database::RocksDb
+			// },
+			// #[cfg(not(feature = "rocksdb"))]
+			#[cfg(feature = "paritydb")]
 			{
 				Database::ParityDb
 			},
