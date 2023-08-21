@@ -25,6 +25,7 @@ rls*.log
 *.bin
 *.iml
 bin/node-template/Cargo.lock
+bin/node-clawbird/Cargo.lock
 substrate.code-workspace
 .direnv/
 /.envrc
