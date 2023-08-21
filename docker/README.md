@@ -1,3 +1,24 @@
+# Substrate "Clawbird" Builder Docker Image
+
+The [Clawbird .Dockerfile](./substrate_clawbird_builder.Dockerfile) is based on the original Substrate [.Dockerfile](./substrate_clawbird_builder.Dockerfile) and is for development purposes.
+
+* Install [Docker](https://docs.docker.com/get-docker/).
+* Generate the latest ltfschoen-substrate image:
+```sh
+./docker/setup-clawbird.sh
+```
+> Note: The naming convention of `-` rather than `/` is used since container names may not include `/`.
+
+> If you wish to create a debug build rather than a production build, then you may modify the [.Dockerfile](./substrate_clawbird_builder.Dockerfile) replacing `cargo build --locked --release` with just `cargo build --locked` and replacing `target/release` with `target/debug`.
+
+> If you get an error that a tcp port address is already in use, such as `Bind for 0.0.0.0:30333 failed: port is already allocated.` then find an available port to use for the host port in the [.Dockerfile](./substrate_clawbird_builder.Dockerfile).
+
+* Wait until it enters you into the Docker container...
+    * To exit the Docker container run CTRL-D or similar
+    * To re-enter Docker container run `docker exec -it ltfschoen-substrate /bin/bash`
+
+* Run an binary (e.g. `cargo run -p node-clawbird`)
+
 # Substrate Builder Docker Image
 
 The Docker image in this folder is a `builder` image. It is self contained and allows users to build the binaries themselves.
@@ -19,7 +40,7 @@ Then to generate the latest parity/substrate image. Please run:
 ./build.sh
 ```
 
-> If you wish to create a debug build rather than a production build, then you may modify the [.Dockerfile](./substrate_builder.Dockerfile) replacing `cargo build --locked --release` with just `cargo build --locked` and replacing `target/release` with `target/debug`. 
+> If you wish to create a debug build rather than a production build, then you may modify the [.Dockerfile](./substrate_builder.Dockerfile) replacing `cargo build --locked --release` with just `cargo build --locked` and replacing `target/release` with `target/debug`.
 
 > If you get an error that a tcp port address is already in use then find an available port to use for the host port in the [.Dockerfile](./substrate_builder.Dockerfile).
 
