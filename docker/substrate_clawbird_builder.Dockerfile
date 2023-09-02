@@ -95,9 +95,8 @@ RUN apt-get -y update --fix-missing && \
 	pyenv versions && \
 	pyenv global 3.11 && \
 	pyenv local 3.11 && \
-	pip install yq
-	# && \
-	# cargo build
+	pip install yq && \
+	cargo build -p node-clawbird --release --locked
 
 EXPOSE 30333 9933 9944 9615
 
